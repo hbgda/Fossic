@@ -6,7 +6,7 @@
 
     
     $: prog_style = `width: ${(parseInt(value)/parseInt(max))*100}%`
-    $: thumb_style = `left: calc(${(parseInt(value)/parseInt(max))*100}% - ${(parseInt(value)/parseInt(max))*100 <= 2 ? "0px": "20px"})`
+    $: thumb_style = `left: calc(${((parseInt(value)/parseInt(max))*100) || 0}% - 20px)`
 
     import { createEventDispatcher } from 'svelte'
     const dispatch = createEventDispatcher()
@@ -44,9 +44,6 @@
         top: -7.5px;
         
     }
-    input:hover .range-thumb {
-        background-color: white;
-    }
     div > .range-track {
         position: absolute;
         left: 0;
@@ -72,6 +69,8 @@
         border-color: rgb(67, 67, 166);
         border-width: 2px;
         border-style: solid;
+        margin-right: 15px;
+        margin-left: 15px;
     }
     
 </style>

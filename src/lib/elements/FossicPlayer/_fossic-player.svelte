@@ -1,10 +1,17 @@
 <script lang="ts">
-    import Slider from "./_slider.svelte"
+    import Slider from "../_slider.svelte"
+    import type SongItem from "../_song-item.svelte"
+    import PlayerQueue from "./_player-queue.svelte"
 
     export let src: string = ""
     export let img: string = ""
     export let title: string = ""
     export let author: string = ""
+    export let queue: SongItem[] = []
+
+    export let settings = {}
+
+    export let nowPlaying: number = 0
 
 
     $: _src = src
@@ -26,6 +33,29 @@
         xhr.send(JSON.stringify({
             type: "finished"
         }))
+        if(settings["repeatQueue"] == true) {
+            nowPlaying = -1
+        }
+        nextSong()
+    }
+
+    function indexChanged(num) {
+        nowPlaying = num      
+        let info = queue[num].getInfo()
+        setSong(info["title"], info["author"], info["thumbnail"], info["src"])
+    }
+
+    export function nextSong() {
+        if(nowPlaying < queue.length-1)
+            nowPlaying++
+        indexChanged(nowPlaying)    
+    }
+        
+
+    export function prevSong(){
+        if (nowPlaying > 0)
+            nowPlaying--
+        indexChanged(nowPlaying)
     }
 
     export function setSong(ntitle, nauthor, nimage, nsrc) {
@@ -43,6 +73,7 @@
             length: duration,
             type: "started"
         }))
+        audio.play()
     }
 
     $: max = `${duration}`
@@ -88,7 +119,7 @@
 </svelte:head>
 
 <div class="fossic-player has-shadow">
-    <audio autoplay bind:ended bind:duration bind:currentTime bind:paused bind:this={audio} {src}></audio>
+    <audio autoplay={settings["autoplay"]} bind:ended bind:duration bind:currentTime bind:paused bind:this={audio} {src}></audio>
     <div class="progress-bar-container">
         <Slider on:changed={sliderChanged} bind:max bind:value></Slider>
     </div>
@@ -102,18 +133,21 @@
     </div>
 
     <div class="middle-section">
-        <button class="previous">
+        <button class="previous" on:click={() => prevSong()}>
 
         </button>
         <button class="playback-toggle {!paused ? 'playing': 'paused'}" on:click={togglePlayback} >
 
         </button>
-        <button class="next">
+        <button class="next" on:click={() => nextSong()}>
 
         </button>
     </div>
 
     <div class="right-section">
+        <PlayerQueue on:itemChanged={(e) => indexChanged(e.detail)} songs={queue}>
+
+        </PlayerQueue>
         <p class="time">
             {time_str}
         </p>
@@ -129,7 +163,7 @@
         height: 70px;
         background-color: #3c3c3cff;
         min-width: 565px;
-        overflow-x: visible;
+        overflow-x: clip;
         overflow-y: visible;
     }
 
@@ -184,6 +218,9 @@
         outline: none;
         border: none;
     }
+    .fossic-player > .middle-section > button:hover {
+        cursor: pointer;
+    }
     .fossic-player > .middle-section > .playback-toggle {
         height: 50px;
         width: 50px;
@@ -206,17 +243,17 @@
     }
 
     .fossic-player > .right-section {
-        height: 100%;
+        height: 85%;
         position: absolute;
-        right: 0;
+        right: 20px;
         bottom: 0;
         width: 33%;
+        display: flex;
+        flex-direction: row-reverse;
+        align-items: center;
     }
     .fossic-player > .right-section > .time {    
-        margin-right: 15px;
-        position: absolute;
-        top: 25%;
-        right: 0;
+        margin-right: 30px;
         transform: translateY(-25%);
     }
 

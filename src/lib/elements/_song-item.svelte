@@ -1,8 +1,9 @@
 <script lang="ts">
     export let title: string = "Test"
     export let author: string = "Test Author"
-    export let thumbnail: string = "/song_images/lie-lie-lie.jpg"
-    export let songPath: string = "/songs/09 - Lie Lie Lie.flac"
+    export let thumbnail: string = ""
+    export let src: string = ""
+    
     if (title.length > 45) {
         title = title.trim().substring(0, 45).split(" ").slice(0, -1).join(" ") + "…";
     }
@@ -10,9 +11,16 @@
     import { createEventDispatcher } from "svelte/internal";
     const dispatch = createEventDispatcher()
 
-    function clicked() {
+    export function clicked() {
         dispatch("clicked")
     }
+
+    export function getInfo() {
+        return {
+            title, author, thumbnail, src
+        }
+    }
+
 </script>
 
 <div class="song-item has-shadow" on:click={clicked}>

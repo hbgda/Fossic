@@ -2,8 +2,10 @@ const express = require("express")
 const fileUpload = require("express-fileupload")
 const cors = require("cors")
 const mm = require("music-metadata")
-const hash = require("./hash.cjs")
 const fs = require("fs")
+const crypto = require("crypto")
+
+
 
 const clientId = fs.readFileSync("./server/rpc-clientid").toString()
 console.log(clientId)
@@ -18,11 +20,16 @@ rpc.on("ready", () => {
   rpc.setActivity({
     details: "Idling",
     largeImageKey: "default",
-    state: "Picking a song.",
+    state: "Probably fixing a bug.",
     startTimestamp
   })
 })
 rpc.login({clientId})
+
+
+
+
+
 let app = express()
 
 app.use(cors())
@@ -33,8 +40,11 @@ app.use(fileUpload({
     tempFileDir: "./tmp"
 }))
 
+function generateID() {
+
+}
+
 app.post("/upload", async (req, res, next) => {
-    console.log(req.files)
     if(!req.files || Object.keys(req.files).length <= 0) {
         return res.status(400).send("No files were uploaded.")
     }
@@ -43,38 +53,37 @@ app.post("/upload", async (req, res, next) => {
     if(!file || !(file.name.endsWith(".flac") | file.name.endsWith(".mp3") | file.name.endsWith(".ogg") | file.name.endsWith(".wav"))) {
       return res.sendStatus(404)
     }
-    console.log(file)
 
-
-    const fileHash = hash.murmurhash3_32_gc(file.name, Date.now())
-    const filename = fileHash + "." + file.name.split(".").pop()
+    const fileID = crypto.randomUUID()
+    const filename = fileID + "." + file.name.split(".").pop()
     console.log(filename)
 
     file.mv("./static/songs/" + filename, async (err) => {
         if(err) return res.status(500).send(err)
 
-        const metadata = await mm.parseFile("./static/songs/" + filename )
+        const metadata = await mm.parseFile("./static/songs/" + filename)
 
         let hasCover = metadata.common.picture != undefined
-        console.log(hasCover)
 
         let data = {
-          image: hasCover ? "/song_images/" + fileHash : "/default.jpg",
+          image: hasCover ? "/song_images/" + fileID : "/default.jpg",
           title: metadata.common.title.replace(`${metadata.common.artist} - `, ""),
           author: metadata.common.artist,
           srcType: file.name.split(".").pop(),
-          hash: fileHash
+          hash: fileID
         }
 
 
 
-        fs.writeFileSync("./data/songs/" + fileHash, JSON.stringify(data))
+        fs.writeFileSync("./data/songs/" + fileID, JSON.stringify(data))
         if(hasCover)
-            fs.writeFileSync("./static/song_images/" + fileHash, metadata.common.picture[0].data)
+            fs.writeFileSync("./static/song_images/" + fileID, metadata.common.picture[0].data)
 
         return res.send(data)
     })
 })
+
+
 
 app.post("/discord-rpc", (req, res) => {
   if (req.body.type == "started") {
@@ -88,7 +97,7 @@ app.post("/discord-rpc", (req, res) => {
   else {
     rpc.setActivity({
       details: "Idling",
-      state: "Picking a song.",
+      state: "Probably fixing a bug.",
       startTimestamp,
       largeImageKey: "default"
     })
@@ -96,6 +105,12 @@ app.post("/discord-rpc", (req, res) => {
 
   res.send("ok")
 })
+
+
+
+
+
+
 
 let debug = require('debug')('fossic:server')
 let http = require('http')

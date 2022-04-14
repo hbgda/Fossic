@@ -14,6 +14,10 @@
     <link rel="stylesheet" href="global.css">
 </head>
 
+<svelte:head>
+    <title>Fossic</title>
+</svelte:head>
+
 <slot></slot>
 
 <style>

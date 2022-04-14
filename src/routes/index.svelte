@@ -1,16 +1,21 @@
 <script lang="ts">
     export let songItems = []
-    console.log(songItems)
+    export let settings = {}
 
     $: songs = [...songItems]
+
+    $: songElements = []
+
+    let queue = []
 
     import SearchBar from "$lib/elements/_search-bar.svelte";
     import ItemList from "$lib/elements/_item-list.svelte";
     import SongItem from "$lib/elements/_song-item.svelte";
-    import FossicPlayer from "$lib/elements/_fossic-player.svelte";
+    import FossicPlayer from "$lib/elements/FossicPlayer/_fossic-player.svelte";
     import Modal from "$lib/elements/_modal.svelte";
     import SongUploader from "$lib/elements/_song-uploader.svelte";
-    import { dataset_dev, onMount } from "svelte/internal";
+    import OptionsDisplay from "$lib/elements/_options-display.svelte"
+    import { onMount } from "svelte/internal";
 
     let shouldShowModal: boolean = false
 
@@ -30,13 +35,19 @@
         console.log(sList)
     })
 
-    function songClicked(title, author, image, src) {
-        player.setSong(title, author, image, src)
+    function songClicked(song, i) {
+        queue = [...queue, songElements[i]]
+        if(queue.length == 1) {
+            player.setSong(song["title"], song["author"], song["image"], song["src"])
+        }
     }
 
 </script>
 
 <div class="content">
+    <OptionsDisplay bind:settings>
+
+    </OptionsDisplay>
     {#if shouldShowModal}
         <Modal title="Upload" on:close={() => shouldShowModal = false}>
             <SongUploader on:finished={(data) => songItems = [data.detail, ...songItems]}/>
@@ -48,12 +59,12 @@
     </button>
 
     <ItemList bind:this={sList} id="song-list" title="Your Songs">
-        {#each songs as song}
-            <SongItem on:clicked={() => songClicked(song["title"], song["author"], `${song["image"]}`, `/songs/${song["hash"]}.${song["srcType"]}`)} title={song["title"]} author={song["author"]} thumbnail={song["image"]}></SongItem>
+        {#each songs as song, i}
+            <SongItem bind:this={songElements[i]} on:clicked={(e) => songClicked(song, i)} title={song["title"]} author={song["author"]} thumbnail={song["image"]} src={song["src"]}></SongItem>
         {/each}
     </ItemList>
 
-    <FossicPlayer bind:this={player}></FossicPlayer>
+    <FossicPlayer bind:settings queue={queue} bind:this={player}></FossicPlayer>
 </div>
 
 
