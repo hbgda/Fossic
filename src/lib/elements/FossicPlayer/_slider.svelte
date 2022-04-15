@@ -18,7 +18,7 @@
 </script>
 
 <div>
-    <input on:input={sliderChange} type="range" min="0" bind:value={_slider_val} {max}>
+    <input on:input={sliderChange} type="range" bind:value={_slider_val} {max} {min}>
     <div class="range-track">
 
     </div>

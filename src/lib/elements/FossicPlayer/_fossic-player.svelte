@@ -1,5 +1,8 @@
 <script lang="ts">
-    import Slider from "../_slider.svelte"
+    export let settings = {}
+
+
+    import Slider from "./_slider.svelte"
     import type SongItem from "../_song-item.svelte"
     import PlayerQueue from "./_player-queue.svelte"
 
@@ -9,23 +12,18 @@
     export let author: string = ""
     export let queue: SongItem[] = []
 
-    export let settings = {}
 
     export let nowPlaying: number = 0
-
-
-    $: _src = src
-    $: _img = img
-    $: _title = title
-    $: _author = author
+    
 
     export let paused: boolean = true
     export let currentTime: number = 0
     export let duration: number = 0
 
-    export let ended: boolean = false
+
+    let playerQueue: PlayerQueue = undefined
     
-    $: if (ended) {
+    function songFinished() {
         currentTime = 0
         let xhr = new XMLHttpRequest()
         xhr.open("POST", "http://127.0.0.1:3001/discord-rpc")
@@ -33,7 +31,7 @@
         xhr.send(JSON.stringify({
             type: "finished"
         }))
-        if(settings["repeatQueue"] == true) {
+        if(settings["repeatQueue"] == true && nowPlaying >= queue.length - 1) {
             nowPlaying = -1
         }
         nextSong()
@@ -43,6 +41,8 @@
         nowPlaying = num      
         let info = queue[num].getInfo()
         setSong(info["title"], info["author"], info["thumbnail"], info["src"])
+        playerQueue.setActiveItem(num)
+
     }
 
     export function nextSong() {
@@ -69,8 +69,6 @@
         xhr.send(JSON.stringify({
             title, 
             author, 
-            image: img,
-            length: duration,
             type: "started"
         }))
         audio.play()
@@ -109,7 +107,22 @@
         let secondsStr = ("00" + seconds).slice(-2);
 
         return minutesStr + ":" + secondsStr
-}
+    }
+
+    export function shuffleQueue() {
+        let tmp = queue[nowPlaying]
+        queue.splice(nowPlaying, 1)
+        queue = [tmp, ...queue.sort(a => .5 - Math.random())]
+        nowPlaying = 0
+        playerQueue.setActiveItem(0)
+    }
+
+    let showVol = false
+
+    function volChanged(e) {
+        let vol = e.target.value / 100
+        audio.volume = vol
+    }
 
 
 </script>
@@ -119,7 +132,7 @@
 </svelte:head>
 
 <div class="fossic-player has-shadow">
-    <audio autoplay={settings["autoplay"]} bind:ended bind:duration bind:currentTime bind:paused bind:this={audio} {src}></audio>
+    <audio autoplay={settings["autoplay"]} on:ended={songFinished} bind:duration bind:currentTime bind:paused bind:this={audio} {src}></audio>
     <div class="progress-bar-container">
         <Slider on:changed={sliderChanged} bind:max bind:value></Slider>
     </div>
@@ -133,6 +146,9 @@
     </div>
 
     <div class="middle-section">
+    <button class="shuffle secondary" on:click={shuffleQueue}>
+
+        </button>
         <button class="previous" on:click={() => prevSong()}>
 
         </button>
@@ -142,15 +158,27 @@
         <button class="next" on:click={() => nextSong()}>
 
         </button>
+        <button class="repeat secondary {settings["repeatQueue"] ? "enabled" : ""}" on:click={() => settings["repeatQueue"] = !settings["repeatQueue"]}>
+
+        </button>
     </div>
 
     <div class="right-section">
-        <PlayerQueue on:itemChanged={(e) => indexChanged(e.detail)} songs={queue}>
+        <PlayerQueue bind:this={playerQueue} on:itemChanged={(e) => indexChanged(e.detail)} songs={queue}>
 
         </PlayerQueue>
         <p class="time">
             {time_str}
         </p>
+        <div class="volume-control">
+            <button class="volume-btn" on:click={() => showVol = !showVol}>
+            </button>
+            <div class="has-shadow" style={showVol ? "width: fit-content" : "width: 0px"} on:mouseleave={() => showVol = false}>
+                <div>
+                    <input on:input={volChanged} type="range" name="" id="" max="100" value="100" on:blur={() => showVol = false}>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -241,12 +269,29 @@
     .fossic-player > .middle-section > .next {
         background-image: url("/skipbtn.png");
     }
+    .fossic-player > .middle-section > .secondary {
+        height: 20px;
+        background-size: 20px;
+        width: 20px;
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+    .fossic-player > .middle-section > .shuffle {
+        background-image: url("/shuffle.png");
+    }
+    .fossic-player > .middle-section > .repeat {
+        opacity: .3;
+        background-image: url("/repeat.png");
+    }
+    .fossic-player > .middle-section > .repeat.enabled {
+        opacity: 1;
+    }
 
     .fossic-player > .right-section {
         height: 85%;
         position: absolute;
         right: 20px;
-        bottom: 0;
+        bottom: 2px;
         width: 33%;
         display: flex;
         flex-direction: row-reverse;
@@ -254,7 +299,36 @@
     }
     .fossic-player > .right-section > .time {    
         margin-right: 30px;
-        transform: translateY(-25%);
+    }
+    .fossic-player > .right-section > * > .volume-btn {
+        background-image: url("/volume.png");
+        background-size: 25px;
+        border: none;
+        background-position: 0;
+        background-repeat: no-repeat;
+        background-color: transparent;
+        height: 30px;
+        width: 30px;
+        margin-right: 10px;
+    }
+    .fossic-player > .right-section > * > .volume-btn:hover {
+        cursor: pointer;
+    }
+
+    .fossic-player > .right-section > .volume-control > div {
+        width: fit-content;
+        height: fit-content;
+        background-color: #3c3c3c;
+        rotate: -90deg;
+        position: absolute;
+        bottom: 120px;
+        right: 95px;
+        z-index: 1;
+        overflow: hidden;
+        border-radius: 15px;
+    }
+    .fossic-player > .right-section > .volume-control > div > div {
+        padding: 10px;
     }
 
 </style>

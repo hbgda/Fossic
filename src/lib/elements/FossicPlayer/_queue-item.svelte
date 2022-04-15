@@ -6,6 +6,8 @@
     export let title: string = ""
     export let author: string = ""
     export let thumbnail: string = ""
+    export let active: boolean = false
+
     $: if(songItem != undefined) {
         let songData = songItem.getInfo()
         title = songData.title
@@ -14,15 +16,26 @@
     }
     export let idx: number = -1
 
+    let div: HTMLDivElement = undefined
+
     const dispatch = createEventDispatcher()
 
     function clicked() {
         dispatch("clicked", idx)
     }
 
+    export function setActive(active: boolean) {
+        if(active) {
+            div.classList.add("active")
+        }
+        else {
+            div.classList.remove("active")
+        }
+    }
+
 </script>
 
-<div class="item" on:click={() => clicked()}>
+<div bind:this={div} class="item {active ? "active" : ""}" on:click={() => clicked()}>
     <div class="overlay"></div>
     <img src={thumbnail} alt="">
     <div class="info">
@@ -90,5 +103,8 @@
     .author {
         font-size: small;
         opacity: 0.7;
+    }
+    .active {
+        background-color: rgb(67, 67, 166);
     }
 </style>

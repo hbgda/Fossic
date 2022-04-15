@@ -1,5 +1,5 @@
 <script lang="ts">
-    export let showSettings = true
+    export let showSettings = false
 
     export let settings = undefined
 
@@ -22,7 +22,7 @@
         localStorage.setItem("settings", JSON.stringify(settings))
     }
 
-    $: showStr = showSettings ? "height: 0px" : "height: 200px"
+    $: showStr = showSettings ? "height: 100px" : "height: 0px"
 
 </script>
 
@@ -30,13 +30,10 @@
     <button class="settings-btn {showSettings ? "open" : "close"}" on:click={() => showSettings = !showSettings}>
 
     </button>
-    <div class="settings has-shadow" style={showStr}>
+    <div class="settings has-shadow" style={showStr} on:mouseleave={() => showSettings = false}>
         <div class="container">
             <label for="auto-play">Auto-play</label>
             <input bind:checked={autoplay} type="checkbox" name="auto-play" id="auto-play">
-       
-            <label for="auto-play">Repeat Queue</label>
-            <input bind:checked={repeatQueue} type="checkbox" name="repeat-queue" id="repeat-queue">
         </div>
     </div>
 </div>
@@ -53,16 +50,16 @@
         position: absolute;
         top: 60px;
         right: 20px;
-        transition: all .25;
+        transition: all 0.25;
     }
     .settings-btn:hover {
         cursor: pointer;
     }
-    .open {
+    .close {
         transition: all 0.25s;
         rotate: 90deg;
     }
-    .close {
+    .open {
         transition: all 0.25s;
         rotate: -90deg;
     }
@@ -71,6 +68,7 @@
         position: absolute;
         background-color: #3c3c3c;
         top: 100px;
+        height: 0px;
         width: 300px;
         right: 20px;
         z-index: 1;

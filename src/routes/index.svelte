@@ -58,11 +58,14 @@
         Upload 
     </button>
 
-    <ItemList bind:this={sList} id="song-list" title="Your Songs">
-        {#each songs as song, i}
-            <SongItem bind:this={songElements[i]} on:clicked={(e) => songClicked(song, i)} title={song["title"]} author={song["author"]} thumbnail={song["image"]} src={song["src"]}></SongItem>
-        {/each}
-    </ItemList>
+    <div class="content-display">
+        <ItemList bind:this={sList} id="song-list" title="Your Songs">
+            {#each songs as song, i}
+                <SongItem bind:this={songElements[i]} on:clicked={(e) => songClicked(song, i)} title={song["title"]} author={song["author"]} thumbnail={song["image"]} src={song["src"]}></SongItem>
+            {/each}
+        </ItemList>
+    </div>
+
 
     <FossicPlayer bind:settings queue={queue} bind:this={player}></FossicPlayer>
 </div>
@@ -101,5 +104,34 @@
         height: 20px;
         width: 70px;
         border-radius: 0 15px 0 15px;
+    }
+    .content-display {
+        display: flex;
+        flex-direction: row;
+        height: fit-content;
+    }
+    .playlists {
+        width: 100%;
+        height: calc(100vh - 245px);
+        background-color: transparent;
+        margin: 25px;
+    }
+    .playlists > div {
+        width: 100%;
+        height: 50px;
+        background-color: #3c3c3c;
+        margin-bottom: 5px;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    .playlists > p1 {
+        width: 100%;
+        text-align: center;
+    } 
+    .playlists > div > .title {
+        float: left;
+    }
+    .playlists> div > .song-count {
+        float: right;
     }
 </style>

@@ -37,8 +37,6 @@
     }
     .item-list {
         margin: 15px;
-        max-width: 90vw;
-        width: 90vw;
         min-width: 565px;
         position: relative;
         -webkit-mask-image: linear-gradient(to bottom, black 90%, transparent 100%);
@@ -52,7 +50,10 @@
         grid-auto-flow: column;
         scrollbar-width: thin;
         height: 100%;
+        padding: 0;
         max-height: calc(100vh - 245px);
+        text-align: center;
+        margin: auto;
     }
     .item-list > .list > :global(*) {    
         display: inline-flex !important; 
