@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { createEventDispatcher } from "svelte/internal";
+    import { createEventDispatcher, now } from "svelte/internal";
     import type SongItem from "../_song-item.svelte";
     import QueueItem from "./_queue-item.svelte";
 
@@ -13,6 +13,7 @@
 
     const dispatch = createEventDispatcher()
     function itemClicked(idx) {
+        if(current == queueItems[idx]) return
         dispatch("itemChanged", idx)
     }
 
@@ -33,7 +34,7 @@
     <button class="queue-btn" on:click={() => showQueue = !showQueue}>
     </button>
     <div class="queue has-shadow" style={showStr} on:mouseleave={() => showQueue = false}>
-        {#each songs as song, i}
+        {#each songs as song, i (`${song.getInfo()["hash"] || song.getInfo()["id"]} ${i}`)}
             <QueueItem active={i == 0 ? true : false} bind:this={queueItems[i]} on:clicked={() => itemClicked(i)} songItem={song}></QueueItem>
         {/each}
     </div>

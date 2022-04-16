@@ -22,6 +22,7 @@
 
 <style>
     nav {
+        display: none;
         position: absolute;
         width: 100%;
         left: 0%;

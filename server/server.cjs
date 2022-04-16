@@ -70,7 +70,7 @@ app.post("/upload", async (req, res, next) => {
           title: metadata.common.title.replace(`${metadata.common.artist} - `, ""),
           author: metadata.common.artist,
           srcType: file.name.split(".").pop(),
-          hash: fileID
+          id: fileID
         }
 
 

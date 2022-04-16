@@ -1,6 +1,6 @@
 <script lang="ts">
-    export let settings = {}
 
+    import { settings } from "$lib/user_data/stores";
 
     import Slider from "./_slider.svelte"
     import type SongItem from "../_song-item.svelte"
@@ -31,7 +31,7 @@
         xhr.send(JSON.stringify({
             type: "finished"
         }))
-        if(settings["repeatQueue"] == true && nowPlaying >= queue.length - 1) {
+        if($settings["repeatQueue"] == true && nowPlaying >= queue.length - 1) {
             nowPlaying = -1
         }
         nextSong()
@@ -71,6 +71,7 @@
             author, 
             type: "started"
         }))
+        audio.currentTime = 0
         audio.play()
     }
 
@@ -132,7 +133,7 @@
 </svelte:head>
 
 <div class="fossic-player has-shadow">
-    <audio autoplay={settings["autoplay"]} on:ended={songFinished} bind:duration bind:currentTime bind:paused bind:this={audio} {src}></audio>
+    <audio autoplay={$settings["autoplay"]} on:ended={songFinished} bind:duration bind:currentTime bind:paused bind:this={audio} {src}></audio>
     <div class="progress-bar-container">
         <Slider on:changed={sliderChanged} bind:max bind:value></Slider>
     </div>
@@ -158,7 +159,10 @@
         <button class="next" on:click={() => nextSong()}>
 
         </button>
-        <button class="repeat secondary {settings["repeatQueue"] ? "enabled" : ""}" on:click={() => settings["repeatQueue"] = !settings["repeatQueue"]}>
+        <button class="repeat secondary {$settings["repeatQueue"] ? "enabled" : ""}" on:click={() => {
+            $settings["repeatQueue"] = !$settings["repeatQueue"]
+            settings.set($settings)
+        }}>
 
         </button>
     </div>

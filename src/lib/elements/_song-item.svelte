@@ -1,8 +1,16 @@
+
 <script lang="ts">
     export let title: string = "Test"
     export let author: string = "Test Author"
     export let thumbnail: string = ""
     export let src: string = ""
+    export let id: string = ""
+    
+    import { favourites } from "$lib/user_data/stores";
+    export let isFav: boolean = $favourites.includes(id)
+    favourites.subscribe(val => {
+        isFav = val.includes(id)
+    })
     
     if (title.length > 45) {
         title = title.trim().substring(0, 45).split(" ").slice(0, -1).join(" ") + "…";
@@ -17,13 +25,23 @@
 
     export function getInfo() {
         return {
-            title, author, thumbnail, src
+            title, author, thumbnail, src, id
+        }
+    }
+
+    export function rClicked(e) {
+        e.preventDefault()
+        if($favourites.includes(id)) {
+            favourites.set($favourites.filter(s => s != id))
+        }
+        else {
+            favourites.set([...$favourites, id])
         }
     }
 
 </script>
 
-<div class="song-item has-shadow" on:click={clicked}>
+<div class="song-item has-shadow {isFav ? "is-fav" : ""}" on:click={clicked} on:contextmenu={rClicked}>
     <img referrer-policy="no-referrer"src={thumbnail} alt="">
     <div class="info">
         <p class="song-title">{title}</p>
@@ -39,6 +57,23 @@
         flex-direction: column;
         position: relative;
         scale: 0.85;
+        overflow: hidden;
+    }
+    .song-item.is-fav::before {
+        content: "";
+        background-image: url("star.png");
+        background-repeat: no-repeat;
+        background-position: 3.25px 30%;
+        background-size: 25px;
+        border-radius: 0 0 15px 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        background-color: #3c3c3cff;
+        width: 35px;
+        height: 35px;
+        line-height: 5;
+        font-size: xx-large;
     }
     .song-item > img {
         height: 200px;

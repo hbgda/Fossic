@@ -4,6 +4,8 @@
     export let maxRows: string = ""
     export let id: string = ""
 
+    export let defaultStr: string = ""
+
     let sVarString = `
         --item-height: ${itemHeight}; 
         --list-height: ${maxRows != "" ? `calc(var(--item-height) * ${maxRows})` : ""}
@@ -22,21 +24,18 @@
     <h class="title">{title}</h>
     <ul class="list">
         <slot>
-            <p>No music.</p>
+            <p>{defaultStr}</p>
         </slot>
     </ul>
-    <div class="bottom-fade">
-
-    </div>
 </div>
 
 <style>
     .item-list > .title {
         font-size: x-large;
-        display: none;
     }
     .item-list {
         margin: 15px;
+        width: calc(100% - 45px);
         min-width: 565px;
         position: relative;
         -webkit-mask-image: linear-gradient(to bottom, black 90%, transparent 100%);
@@ -51,7 +50,7 @@
         scrollbar-width: thin;
         height: 100%;
         padding: 0;
-        max-height: calc(100vh - 245px);
+        max-height: calc(100vh - 215px);
         text-align: center;
         margin: auto;
     }
@@ -59,12 +58,5 @@
         display: inline-flex !important; 
         margin-bottom: 10px;
         margin-right: 10px;
-    }
-    .item-list > .bottom-fade {
-        width: 100%;
-        height: 40px;
-        background-color:transparent;
-        position: absolute;
-        bottom: 0px;
     }
 </style>

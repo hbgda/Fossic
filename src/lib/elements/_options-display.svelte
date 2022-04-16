@@ -1,26 +1,19 @@
 <script lang="ts">
     export let showSettings = false
 
-    export let settings = undefined
+    import { settings } from "$lib/user_data/stores"
 
     if(typeof localStorage != "undefined") {
-        let stored = localStorage.getItem("settings")
-        if(stored != undefined) {
-            settings = JSON.parse(stored)
-        }
+        settings.set(JSON.parse(localStorage.getItem("settings")))
+        settings.subscribe(val => localStorage.setItem("settings", JSON.stringify(val)))
     }
 
-    export let autoplay: boolean = settings["autoplay"] || false
-    export let repeatQueue: boolean = settings["repeatQueue"] || false
+    export let autoplay: boolean = $settings["autoplay"] || false
+    export let repeatQueue: boolean = $settings["repeatQueue"] || false
 
-    $: settings = {
-        autoplay,
-        repeatQueue
-    }
-
-    $: if(settings != undefined && typeof localStorage != "undefined") {
-        localStorage.setItem("settings", JSON.stringify(settings))
-    }
+    $: settings.set({
+        autoplay, repeatQueue
+    })
 
     $: showStr = showSettings ? "height: 100px" : "height: 0px"
 
@@ -48,7 +41,7 @@
         background-color: transparent;
         background-image: url("/settings.png");
         position: absolute;
-        top: 60px;
+        top: 15px;
         right: 20px;
         transition: all 0.25;
     }
@@ -67,11 +60,11 @@
     .settings {
         position: absolute;
         background-color: #3c3c3c;
-        top: 100px;
+        top: 50px;
         height: 0px;
         width: 300px;
         right: 20px;
-        z-index: 1;
+        z-index: 4;
         transition: all 0.25s;
         overflow: clip;
     }
