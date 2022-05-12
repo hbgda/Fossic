@@ -68,6 +68,7 @@
     }
 
     .tab-content > :global(*) {
+        width: calc(100% - 65px) !important;
         transition: all .4s;
         position: absolute !important;
         z-index: -2;

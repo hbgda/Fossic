@@ -20,6 +20,7 @@
     import SongUploader from "$lib/elements/_song-uploader.svelte";
     import OptionsDisplay from "$lib/elements/_options-display.svelte"
     import TabView from "$lib/elements/TabView/_tab-view.svelte"
+    import PlaylistView from "$lib/elements/PlaylistView/_playlist-view.svelte"
 
     import { favourites } from "$lib/user_data/stores";
     if(typeof localStorage != "undefined") {
@@ -96,12 +97,15 @@
         }
     }}>Play All</button>
     <div class="content-display">
-        <TabView tabs={["All", "Favourites"]} bind:selected={selectedTab}>
+        <TabView tabs={["All", "Playlists", "Favourites"]} bind:selected={selectedTab}>
             <ItemList bind:this={sList} id="song-list" title="" defaultStr="No music available, upload something using the Upload button above.">
                 {#each songs as song, i (song)}
                     <SongItem bind:this={songElements[i]} on:clicked={(e) => songClicked(song, i)} title={song["title"]} author={song["author"]} thumbnail={song["image"]} src={song["src"]} id={song["id"] || song["hash"]}></SongItem>
                 {/each}
             </ItemList>
+            <PlaylistView songs={songs}>
+                
+            </PlaylistView>
             <ItemList title="" defaultStr="You don't have any favourited songs, right click a song to add it to your favourites.">
                 {#each favs as song, i (song)}
                     <SongItem bind:this={favsElements[i]} on:clicked={(e) => favClicked(song, i)} title={song["title"]} author={song["author"]} thumbnail={song["image"]} src={song["src"]} id={song["id"] || song["hash"]}></SongItem>

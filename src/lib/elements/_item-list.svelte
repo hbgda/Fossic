@@ -38,8 +38,8 @@
         width: calc(100% - 45px);
         min-width: 565px;
         position: relative;
-        -webkit-mask-image: linear-gradient(to bottom, black 90%, transparent 100%);
-        mask-image: linear-gradient(to bottom, black 90%, transparent 100%);
+        -webkit-mask-image: linear-gradient(to bottom, black 97%, transparent 100%);
+        mask-image: linear-gradient(to bottom, black 97%, transparent 100%);
     }
     .item-list > .list {
         overflow-y: scroll;

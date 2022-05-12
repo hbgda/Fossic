@@ -4,7 +4,7 @@ export class SongProvider {
     static getSongData() {
         return fs.readdirSync("./data/songs/").map(f => {
             const raw = fs.readFileSync("./data/songs/" + f)
-            let json = JSON.parse(raw)
+            let json = JSON.parse(raw.toString())
             json["src"] = `/songs/${f}.${json["srcType"]}`
             return json
         })

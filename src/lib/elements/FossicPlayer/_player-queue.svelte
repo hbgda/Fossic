@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { createEventDispatcher, now } from "svelte/internal";
+    import { createEventDispatcher } from "svelte/internal";
     import type SongItem from "../_song-item.svelte";
     import QueueItem from "./_queue-item.svelte";
 
@@ -18,7 +18,8 @@
     }
 
     export function setActiveItem(idx) {
-        if(!current) {
+        console.log(idx)
+        if(current == undefined) {
             current = queueItems[0]
         }
         current.setActive(false)

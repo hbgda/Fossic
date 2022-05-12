@@ -105,6 +105,6 @@
         opacity: 0.7;
     }
     .active {
-        background-color: rgb(67, 67, 166);
+        background-image: linear-gradient(to right, rgb(67, 67, 166), 70%, transparent); /*, rgb(67, 67, 166));*/
     }
 </style>

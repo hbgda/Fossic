@@ -96,8 +96,8 @@
         currentTime = val.detail
     }
 
-    function convertTimestamp(ms) {
-        let seconds = ms
+    function convertTimestamp(s) {
+        let seconds = s
         seconds = Math.floor(seconds % 3600); 
 
         let minutes = Math.floor(seconds / 60); 
